@@ -21,7 +21,7 @@ interface AnalysisResult {
 const HealthAnalyzer = () => {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const apiKey = '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';
+  const apiKey = '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';
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
