@@ -231,10 +231,6 @@ const HealthAnalyzer = () => {
       return;
     }
     setSupportSubmitted(true);
-    toast({
-      title: "Solicitação enviada! 📞",
-      description: "Nossa equipe entrará em contato em breve."
-    });
   };
 
   const handleRefundSubmit = () => {
@@ -247,10 +243,6 @@ const HealthAnalyzer = () => {
       return;
     }
     setRefundSubmitted(true);
-    toast({
-      title: "Solicitação de reembolso enviada! 💰",
-      description: "Analisaremos e processaremos em até 2 dias úteis."
-    });
   };
 
   return (
