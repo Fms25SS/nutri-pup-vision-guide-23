@@ -1,7 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Upload, Camera, Eye, Heart, AlertCircle, CheckCircle, Sparkles, Star, Users, Award, Zap, Shield } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Upload, Camera, Eye, Heart, AlertCircle, CheckCircle, Sparkles, Star, Users, Award, Zap, Shield, Phone, CreditCard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import vetCamLogo from '@/assets/vetcam-logo.png';
@@ -17,11 +21,20 @@ interface AnalysisResult {
 const HealthAnalyzer = () => {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const apiKey = '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';
+  const apiKey = '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';
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  
+  // Support states
+  const [supportData, setSupportData] = useState({ phone: '', help: '' });
+  const [supportSubmitted, setSupportSubmitted] = useState(false);
+  
+  // Refund states
+  const [refundData, setRefundData] = useState({ email: '', reason: '' });
+  const [refundSubmitted, setRefundSubmitted] = useState(false);
+  
   const { toast } = useToast();
 
   const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -206,6 +219,38 @@ const HealthAnalyzer = () => {
       setStream(null);
     }
     setShowCamera(false);
+  };
+
+  const handleSupportSubmit = () => {
+    if (!supportData.phone || !supportData.help) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha todos os campos.",
+        variant: "destructive"
+      });
+      return;
+    }
+    setSupportSubmitted(true);
+    toast({
+      title: "Solicitação enviada! 📞",
+      description: "Nossa equipe entrará em contato em breve."
+    });
+  };
+
+  const handleRefundSubmit = () => {
+    if (!refundData.email || !refundData.reason) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha todos os campos.",
+        variant: "destructive"
+      });
+      return;
+    }
+    setRefundSubmitted(true);
+    toast({
+      title: "Solicitação de reembolso enviada! 💰",
+      description: "Analisaremos e processaremos em até 2 dias úteis."
+    });
   };
 
   return (
@@ -572,6 +617,140 @@ const HealthAnalyzer = () => {
             </div>
           </div>
         )}
+
+        {/* Support and Refund Buttons */}
+        <div className="max-w-2xl mx-auto mt-16 mb-8">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Support Button */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex-1 h-14 bg-gradient-soft border-border/30 hover:bg-primary-light/20 transition-all duration-300 group"
+                  onClick={() => {
+                    setSupportSubmitted(false);
+                    setSupportData({ phone: '', help: '' });
+                  }}
+                >
+                  <Phone className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
+                  Suporte Técnico
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-3">
+                    <Phone className="w-6 h-6 text-primary" />
+                    Suporte Técnico
+                  </DialogTitle>
+                </DialogHeader>
+                {supportSubmitted ? (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle className="w-8 h-8 text-green-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">Solicitação Enviada!</h3>
+                    <p className="text-muted-foreground">
+                      Nossa equipe de suporte entrará em contato com você em breve através do número fornecido.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="phone">Telefone / WhatsApp</Label>
+                      <Input
+                        id="phone"
+                        placeholder="(11) 99999-9999"
+                        value={supportData.phone}
+                        onChange={(e) => setSupportData({ ...supportData, phone: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="help">Como podemos ajudar?</Label>
+                      <Textarea
+                        id="help"
+                        placeholder="Descreva sua dúvida ou problema..."
+                        value={supportData.help}
+                        onChange={(e) => setSupportData({ ...supportData, help: e.target.value })}
+                        rows={4}
+                      />
+                    </div>
+                    <Button
+                      onClick={handleSupportSubmit}
+                      className="w-full bg-gradient-primary hover:shadow-glow"
+                    >
+                      Enviar Solicitação
+                    </Button>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
+
+            {/* Refund Button */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex-1 h-14 bg-gradient-soft border-border/30 hover:bg-secondary-light/20 transition-all duration-300 group"
+                  onClick={() => {
+                    setRefundSubmitted(false);
+                    setRefundData({ email: '', reason: '' });
+                  }}
+                >
+                  <CreditCard className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
+                  Solicitar Reembolso
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-3">
+                    <CreditCard className="w-6 h-6 text-secondary" />
+                    Solicitar Reembolso
+                  </DialogTitle>
+                </DialogHeader>
+                {refundSubmitted ? (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">Solicitação Recebida!</h3>
+                    <p className="text-muted-foreground">
+                      Nossa equipe analisará sua solicitação e processará o reembolso em até <strong>2 dias úteis</strong> por questões bancárias.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="email">E-mail</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={refundData.email}
+                        onChange={(e) => setRefundData({ ...refundData, email: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="reason">Motivo do reembolso</Label>
+                      <Textarea
+                        id="reason"
+                        placeholder="Explique o motivo da solicitação..."
+                        value={refundData.reason}
+                        onChange={(e) => setRefundData({ ...refundData, reason: e.target.value })}
+                        rows={4}
+                      />
+                    </div>
+                    <Button
+                      onClick={handleRefundSubmit}
+                      className="w-full bg-gradient-secondary hover:shadow-glow"
+                    >
+                      Solicitar Reembolso
+                    </Button>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
 
         {/* Camera Modal */}
         {showCamera && (
